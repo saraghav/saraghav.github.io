@@ -149,6 +149,12 @@ function displayCountdown(e = null) {
   var countdownFinished = document.getElementById("countdown-finished");
   countdownTimer.style.display = "block";
   countdownFinished.style.display = "none";
+
+  // Remove any leftover animations.
+  removeAllAnimations(document.getElementById("countdown-days"));
+  removeAllAnimations(document.getElementById("countdown-hours"));
+  removeAllAnimations(document.getElementById("countdown-minutes"));
+  removeAllAnimations(document.getElementById("countdown-seconds"));
 }
 
 function displayCountdownFinished(e = null) {
