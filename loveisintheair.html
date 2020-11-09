@@ -36,7 +36,7 @@
 #married-image {
   border-radius: 1024px;
   opacity: 60%;
-  max-width: 60%;
+  max-width: 70%;
 }
 
 .time-unit {
@@ -138,6 +138,7 @@ function setupTimeValue(wrapperId, value, enableRandomEffects = true) {
   var valueElem = document.getElementById(wrapperId + "-value");
   if (enableRandomEffects) {
     valueElem.addEventListener("click", randomEffectOnParent);
+    valueElem.addEventListener("touchstart", randomEffectOnParent);
   }
   valueElem.innerHTML = value;
   return wrapperElem;
@@ -161,6 +162,7 @@ function setupAnnouncement() {
   var announcementElem = document.getElementById("announcement");
   announcementElem.addEventListener("mousedown", displayCountdownFinished);
   announcementElem.addEventListener("mouseup", displayCountdown);
+  announcementElem.addEventListener("mouseleave", displayCountdown);
   announcementElem.addEventListener("touchstart", displayCountdownFinished);
   announcementElem.addEventListener("touchend", displayCountdown);
 }
