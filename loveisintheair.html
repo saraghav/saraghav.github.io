@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<style>
+* {
+  font-family: 'Open Sans', sans-serif;
+}
+
+#announcement {
+  text-align: center;
+  font-size: 60px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+#countdown-timer {
+  text-align: center;
+  font-size: 48px;
+  margin-top: 20px;
+}
+
+#announcement-image {
+  max-width: 8%;
+  opacity: 60%;
+}
+
+.time-unit {
+  color: gray;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="announcement">
+  <p>
+    Ragi
+    <img
+      id="announcement-image"
+      src="https://www.flaticon.com/svg/static/icons/svg/3716/3716246.svg" />
+    Sushi
+  </p>
+</div>
+<div id="countdown-timer">
+</div>
+
+<script>
+// Set the date we're counting down to
+var countDownDate = new Date("2021-03-11T07:00:00+05:30").getTime();
+
+function makeSpan(contentText, contentClass) {
+  var elem = document.createElement("span");
+  elem.className = contentClass;
+  elem.innerHTML = contentText;
+  return elem;
+}
+
+function addAnimation(elem, effectName) {
+  elem.classList.add("animate__animated", "animate__" + effectName);
+}
+
+// Update the count down every 1 second
+function updateTimer() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+  
+  var timerElem = document.createElement("p");
+  // If the count down is over, write some text
+  if (distance < 0) {
+    timerElem.innerHTML = "(: it is time :)";
+    return;
+  }
+  
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  
+  // Output the time in parts.
+  var dayElem = document.createElement("div");
+  dayElem.appendChild(makeSpan(days, ""));
+  dayElem.appendChild(makeSpan("d ", "time-unit"));
+  timerElem.appendChild(dayElem);
+  
+  var hourElem = document.createElement("div");
+  hourElem.appendChild(makeSpan(hours, ""));
+  hourElem.appendChild(makeSpan("h ", "time-unit"));
+  timerElem.appendChild(hourElem);
+  
+  var minuteElem = document.createElement("div");
+  minuteElem.appendChild(makeSpan(minutes, ""));
+  minuteElem.appendChild(makeSpan("m ", "time-unit"));
+  timerElem.appendChild(minuteElem);
+  
+  var secondElem = document.createElement("div");
+  secondElem.appendChild(makeSpan(seconds, ""));
+  secondElem.appendChild(makeSpan("s ", "time-unit"));
+  timerElem.appendChild(secondElem);
+  
+  // Animations.
+  addAnimation(secondElem, "headShake");
+  if (seconds == 0) {
+    addAnimation(minuteElem, "flipOutX");
+    if (minutes == 0) {
+      addAnimation(hourElem, "zoomOut");
+      if (hours == 0) {
+        addAnimation(dayElem, "rollOut");
+      }
+    }
+  } else if (seconds == 59) {
+    addAnimation(minuteElem, "flipInX");
+    if (minutes == 59) {
+      addAnimation(hourElem, "zoomIn");
+      if (hours == 23) {
+        addAnimation(dayElem, "rollIn");
+      }
+    }
+  }
+    
+  var elem = document.getElementById("countdown-timer");
+  elem.innerHTML = "";
+  elem.appendChild(timerElem);
+}
+
+setInterval(updateTimer, 1000);
+</script>
+
+</body>
+
+</html>
