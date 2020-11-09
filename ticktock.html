@@ -1,0 +1,231 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+<style>
+* {
+  font-family: 'Open Sans', sans-serif;
+}
+
+#announcement {
+  text-align: center;
+  font-size: 48px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+#countdown-timer {
+  text-align: center;
+  font-size: 48px;
+  margin-top: 20px;
+}
+
+#countdown-finished {
+  text-align: center;
+  display: none;
+}
+
+#announcement-image {
+  max-width: 1em;
+  opacity: 60%;
+}
+
+#married-image {
+  border-radius: 1024px;
+  opacity: 60%;
+  max-width: 70%;
+}
+
+.time-unit {
+  color: gray;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="announcement" class="animate__animated animate__jackInTheBox">
+  <p>
+    Raghav
+    <img
+      id="announcement-image"
+      src="https://www.flaticon.com/svg/static/icons/svg/3716/3716246.svg" />
+    Aishu
+  </p>
+</div>
+
+<div id="countdown-timer">
+  <div id="countdown-days">
+    <span id="countdown-days-value"></span>
+    <span class="time-unit">d</span>
+  </div>
+  <div id="countdown-hours">
+    <span id="countdown-hours-value"></span>
+    <span class="time-unit">h</span>
+  </div>
+  <div id="countdown-minutes">
+    <span id="countdown-minutes-value"></span>
+    <span class="time-unit">m</span>
+  </div>
+  <div id="countdown-seconds">
+    <span id="countdown-seconds-value"></span>
+    <span class="time-unit">s</span>
+  </div>
+</div>
+
+<div id="countdown-finished">
+  <img
+    id="married-image"
+    src="https://webstockreview.net/images/groom-clipart-tamil-4.jpg" />
+</div>
+
+<script>
+// Set the date we're counting down to
+var countDownDate = new Date("2021-03-11T07:00:00+05:30").getTime();
+var randomEffectNames = ["bounce", "flash", "rubberBand", "tada", "jello", "flip"];
+
+function makeSpan(contentText, contentClass) {
+  var elem = document.createElement("span");
+  elem.className = contentClass;
+  elem.innerHTML = contentText;
+  return elem;
+}
+
+function addAnimation(elem, effectName) {
+  elem.classList.add("animate__animated", "animate__" + effectName);
+}
+
+function removeAnimation(elem, effectName) {
+  elem.classList.remove("animate__animated", "animate__" + effectName);
+}
+
+function removeAllAnimations(elem) {
+  var existingAnimations = [];
+  for (var name of elem.classList) {
+    if (name.startsWith('animate__')) {
+      existingAnimations.push(name);
+    }
+  }
+  elem.classList.remove(...existingAnimations);
+}
+
+function cleanupAndAnimate(elem, effectName) {
+  removeAllAnimations(elem);
+  // Hack to force re-paint the element.
+  // Reference: https://martinwolf.org/before-2018/blog/2014/06/force-repaint-of-an-element-with-javascript/
+  elem.offsetHeight;
+  addAnimation(elem, effectName);
+}
+
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randomEffect(e) {
+  cleanupAndAnimate(e.srcElement, randomChoice(randomEffectNames));
+}
+
+function randomEffectOnParent(e) {
+  cleanupAndAnimate(e.path[1], randomChoice(randomEffectNames));
+}
+
+function setupTimeValue(wrapperId, dataValue, enableRandomEffects = true) {
+  var wrapperElem = document.getElementById(wrapperId);
+  var valueElem = document.getElementById(wrapperId + "-value");
+  if (enableRandomEffects) {
+    valueElem.addEventListener("click", randomEffectOnParent);
+    wrapperElem.addEventListener("touchstart", randomEffect);
+  }
+  valueElem.innerHTML = dataValue;
+  return wrapperElem;
+}
+
+function displayCountdown(e = null) {
+  var countdownTimer = document.getElementById("countdown-timer");
+  var countdownFinished = document.getElementById("countdown-finished");
+  countdownTimer.style.display = "block";
+  countdownFinished.style.display = "none";
+
+  // Remove any leftover animations.
+  removeAllAnimations(document.getElementById("countdown-days"));
+  removeAllAnimations(document.getElementById("countdown-hours"));
+  removeAllAnimations(document.getElementById("countdown-minutes"));
+  removeAllAnimations(document.getElementById("countdown-seconds"));
+}
+
+function displayCountdownFinished(e = null) {
+  var countdownTimer = document.getElementById("countdown-timer");
+  var countdownFinished = document.getElementById("countdown-finished");
+  countdownTimer.style.display = "none";
+  countdownFinished.style.display = "block";
+}
+
+function setupAnnouncement() {
+  var announcementElem = document.getElementById("announcement");
+  announcementElem.addEventListener("mousedown", displayCountdownFinished);
+  announcementElem.addEventListener("mouseup", displayCountdown);
+  announcementElem.addEventListener("mouseleave", displayCountdown);
+  announcementElem.addEventListener("touchstart", displayCountdownFinished);
+  announcementElem.addEventListener("touchend", displayCountdown);
+}
+
+// Update the count down every 1 second
+function updateTimer() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+ 
+  // If the count down is over, write some text
+  if (distance < 0) {
+    document.getElementById("countdown-timer").innerHTML = "";
+    displayCountdownFinished();
+    return;
+  }
+  
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+  
+  // Output the time in parts.
+  var daysElem = setupTimeValue("countdown-days", days);
+  var hoursElem = setupTimeValue("countdown-hours", hours);
+  var minutesElem = setupTimeValue("countdown-minutes", minutes);
+  var secondsElem = setupTimeValue("countdown-seconds", seconds, false);
+  
+  // Change animations.
+  cleanupAndAnimate(secondsElem, "headShake");
+  if (seconds == 0) {
+    cleanupAndAnimate(minutesElem, "flipOutX");
+    if (minutes == 0) {
+      cleanupAndAnimate(hoursElem, "zoomOut");
+      if (hours == 0) {
+        cleanupAndAnimate(daysElem, "rollOut");
+      }
+    }
+  } else if (seconds == 59) {
+    cleanupAndAnimate(minutesElem, "flipInX");
+    if (minutes == 59) {
+      cleanupAndAnimate(hoursElem, "zoomIn");
+      if (hours == 23) {
+        cleanupAndAnimate(daysElem, "rollIn");
+      }
+    }
+  }
+}
+
+setInterval(updateTimer, 1000);
+setupAnnouncement();
+
+</script>
+
+</body>
+
+</html>
