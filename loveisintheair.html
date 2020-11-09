@@ -133,14 +133,14 @@ function randomEffectOnParent(e) {
   cleanupAndAnimate(e.path[1], randomChoice(randomEffectNames));
 }
 
-function setupTimeValue(wrapperId, value, enableRandomEffects = true) {
+function setupTimeValue(wrapperId, dataValue, enableRandomEffects = true) {
   var wrapperElem = document.getElementById(wrapperId);
   var valueElem = document.getElementById(wrapperId + "-value");
   if (enableRandomEffects) {
     valueElem.addEventListener("click", randomEffectOnParent);
-    valueElem.addEventListener("touchstart", randomEffectOnParent);
+    wrapperElem.addEventListener("touchstart", randomEffect);
   }
-  valueElem.innerHTML = value;
+  valueElem.innerHTML = dataValue;
   return wrapperElem;
 }
 
