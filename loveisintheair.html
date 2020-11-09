@@ -4,6 +4,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 <style>
 * {
   font-family: 'Open Sans', sans-serif;
@@ -21,9 +23,20 @@
   margin-top: 20px;
 }
 
+#countdown-finished {
+  text-align: center;
+  display: none;
+}
+
 #announcement-image {
   max-width: 1em;
   opacity: 60%;
+}
+
+#married-image {
+  border-radius: 1024px;
+  opacity: 60%;
+  max-width: 60%;
 }
 
 .time-unit {
@@ -44,12 +57,36 @@
     Sushi
   </p>
 </div>
+
 <div id="countdown-timer">
+  <div id="countdown-days">
+    <span id="countdown-days-value"></span>
+    <span class="time-unit">d</span>
+  </div>
+  <div id="countdown-hours">
+    <span id="countdown-hours-value"></span>
+    <span class="time-unit">h</span>
+  </div>
+  <div id="countdown-minutes">
+    <span id="countdown-minutes-value"></span>
+    <span class="time-unit">m</span>
+  </div>
+  <div id="countdown-seconds">
+    <span id="countdown-seconds-value"></span>
+    <span class="time-unit">s</span>
+  </div>
+</div>
+
+<div id="countdown-finished">
+  <img
+    id="married-image"
+    src="https://webstockreview.net/images/groom-clipart-tamil-4.jpg" />
 </div>
 
 <script>
 // Set the date we're counting down to
 var countDownDate = new Date("2021-03-11T07:00:00+05:30").getTime();
+var randomEffectNames = ["bounce", "flash", "rubberBand", "tada", "jello", "flip"];
 
 function makeSpan(contentText, contentClass) {
   var elem = document.createElement("span");
@@ -62,6 +99,72 @@ function addAnimation(elem, effectName) {
   elem.classList.add("animate__animated", "animate__" + effectName);
 }
 
+function removeAnimation(elem, effectName) {
+  elem.classList.remove("animate__animated", "animate__" + effectName);
+}
+
+function removeAllAnimations(elem) {
+  var existingAnimations = [];
+  for (var name of elem.classList) {
+    if (name.startsWith('animate__')) {
+      existingAnimations.push(name);
+    }
+  }
+  elem.classList.remove(...existingAnimations);
+}
+
+function cleanupAndAnimate(elem, effectName) {
+  removeAllAnimations(elem);
+  // Hack to force re-paint the element.
+  // Reference: https://martinwolf.org/before-2018/blog/2014/06/force-repaint-of-an-element-with-javascript/
+  elem.offsetHeight;
+  addAnimation(elem, effectName);
+}
+
+function randomChoice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function randomEffect(e) {
+  cleanupAndAnimate(e.srcElement, randomChoice(randomEffectNames));
+}
+
+function randomEffectOnParent(e) {
+  cleanupAndAnimate(e.path[1], randomChoice(randomEffectNames));
+}
+
+function setupTimeValue(wrapperId, value, enableRandomEffects = true) {
+  var wrapperElem = document.getElementById(wrapperId);
+  var valueElem = document.getElementById(wrapperId + "-value");
+  if (enableRandomEffects) {
+    valueElem.addEventListener("click", randomEffectOnParent);
+  }
+  valueElem.innerHTML = value;
+  return wrapperElem;
+}
+
+function displayCountdown(e = null) {
+  var countdownTimer = document.getElementById("countdown-timer");
+  var countdownFinished = document.getElementById("countdown-finished");
+  countdownTimer.style.display = "block";
+  countdownFinished.style.display = "none";
+}
+
+function displayCountdownFinished(e = null) {
+  var countdownTimer = document.getElementById("countdown-timer");
+  var countdownFinished = document.getElementById("countdown-finished");
+  countdownTimer.style.display = "none";
+  countdownFinished.style.display = "block";
+}
+
+function setupAnnouncement() {
+  var announcementElem = document.getElementById("announcement");
+  announcementElem.addEventListener("mousedown", displayCountdownFinished);
+  announcementElem.addEventListener("mouseup", displayCountdown);
+  announcementElem.addEventListener("touchstart", displayCountdownFinished);
+  announcementElem.addEventListener("touchend", displayCountdown);
+}
+
 // Update the count down every 1 second
 function updateTimer() {
 
@@ -69,11 +172,11 @@ function updateTimer() {
   var now = new Date().getTime();
   // Find the distance between now and the count down date
   var distance = countDownDate - now;
-  
-  var timerElem = document.createElement("p");
+ 
   // If the count down is over, write some text
   if (distance < 0) {
-    timerElem.innerHTML = "(: it is time :)";
+    document.getElementById("countdown-timer").innerHTML = "";
+    displayCountdownFinished();
     return;
   }
   
@@ -84,52 +187,35 @@ function updateTimer() {
   var seconds = Math.floor((distance % (1000 * 60)) / 1000);
   
   // Output the time in parts.
-  var dayElem = document.createElement("div");
-  dayElem.appendChild(makeSpan(days, ""));
-  dayElem.appendChild(makeSpan("d ", "time-unit"));
-  timerElem.appendChild(dayElem);
+  var daysElem = setupTimeValue("countdown-days", days);
+  var hoursElem = setupTimeValue("countdown-hours", hours);
+  var minutesElem = setupTimeValue("countdown-minutes", minutes);
+  var secondsElem = setupTimeValue("countdown-seconds", seconds, false);
   
-  var hourElem = document.createElement("div");
-  hourElem.appendChild(makeSpan(hours, ""));
-  hourElem.appendChild(makeSpan("h ", "time-unit"));
-  timerElem.appendChild(hourElem);
-  
-  var minuteElem = document.createElement("div");
-  minuteElem.appendChild(makeSpan(minutes, ""));
-  minuteElem.appendChild(makeSpan("m ", "time-unit"));
-  timerElem.appendChild(minuteElem);
-  
-  var secondElem = document.createElement("div");
-  secondElem.appendChild(makeSpan(seconds, ""));
-  secondElem.appendChild(makeSpan("s ", "time-unit"));
-  timerElem.appendChild(secondElem);
-  
-  // Animations.
-  addAnimation(secondElem, "headShake");
+  // Change animations.
+  cleanupAndAnimate(secondsElem, "headShake");
   if (seconds == 0) {
-    addAnimation(minuteElem, "flipOutX");
+    cleanupAndAnimate(minutesElem, "flipOutX");
     if (minutes == 0) {
-      addAnimation(hourElem, "zoomOut");
+      cleanupAndAnimate(hoursElem, "zoomOut");
       if (hours == 0) {
-        addAnimation(dayElem, "rollOut");
+        cleanupAndAnimate(daysElem, "rollOut");
       }
     }
   } else if (seconds == 59) {
-    addAnimation(minuteElem, "flipInX");
+    cleanupAndAnimate(minutesElem, "flipInX");
     if (minutes == 59) {
-      addAnimation(hourElem, "zoomIn");
+      cleanupAndAnimate(hoursElem, "zoomIn");
       if (hours == 23) {
-        addAnimation(dayElem, "rollIn");
+        cleanupAndAnimate(daysElem, "rollIn");
       }
     }
   }
-    
-  var elem = document.getElementById("countdown-timer");
-  elem.innerHTML = "";
-  elem.appendChild(timerElem);
 }
 
 setInterval(updateTimer, 1000);
+setupAnnouncement();
+
 </script>
 
 </body>
