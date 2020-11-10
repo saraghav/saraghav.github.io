@@ -6,14 +6,28 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
+
+<!-- For full page mobile web app. -->
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+
 <style>
 * {
   font-family: 'Open Sans', sans-serif;
 }
 
+html, body {
+  overflow-x: hidden;
+}
+
+body {
+  position: relative;
+}
+
 #announcement {
   text-align: center;
-  font-size: 60px;
+  font-size: 48px;
   color: rgba(0, 0, 0, 0.6);
 }
 
@@ -21,6 +35,7 @@
   text-align: center;
   font-size: 48px;
   margin-top: 20px;
+  overflow: hidden;
 }
 
 #countdown-finished {
@@ -41,6 +56,10 @@
 
 .time-unit {
   color: gray;
+}
+
+:root {
+  --animate-delay: 0.5s;
 }
 
 </style>
@@ -114,11 +133,29 @@ function removeAllAnimations(elem) {
 }
 
 function cleanupAndAnimate(elem, effectName) {
+  if (!elem || !effectName) {
+    return;
+  }
   removeAllAnimations(elem);
   // Hack to force re-paint the element.
   // Reference: https://martinwolf.org/before-2018/blog/2014/06/force-repaint-of-an-element-with-javascript/
   elem.offsetHeight;
   addAnimation(elem, effectName);
+}
+
+function fadeOutOtherTimeElements(elem) {
+  var allTimeElementIds = [
+    "countdown-days",
+    "countdown-hours",
+    "countdown-minutes",
+    "countdown-seconds",
+  ];
+  for (idName of allTimeElementIds) {
+    var currentElem = document.getElementById(idName);
+    if (currentElem != elem) {
+      cleanupAndAnimate(currentElem, "fadeOut");
+    }
+  }
 }
 
 function randomChoice(arr) {
@@ -138,7 +175,7 @@ function setupTimeValue(wrapperId, dataValue, enableRandomEffects = true) {
   var valueElem = document.getElementById(wrapperId + "-value");
   if (enableRandomEffects) {
     valueElem.addEventListener("click", randomEffectOnParent);
-    wrapperElem.addEventListener("touchstart", randomEffect);
+    valueElem.addEventListener("touchstart", randomEffectOnParent);
   }
   valueElem.innerHTML = dataValue;
   return wrapperElem;
@@ -201,24 +238,31 @@ function updateTimer() {
   var secondsElem = setupTimeValue("countdown-seconds", seconds, false);
   
   // Change animations.
-  cleanupAndAnimate(secondsElem, "headShake");
+  var secondsAnimation = "headShake";
+  var minutesAnimation = null;
+  var hoursAnimation = null;
+  var daysAnimation = null;
   if (seconds == 0) {
-    cleanupAndAnimate(minutesElem, "flipOutX");
+    minutesAnimation = "flipOutX";
     if (minutes == 0) {
-      cleanupAndAnimate(hoursElem, "zoomOut");
+      hoursAnimation = "flipOutX";
       if (hours == 0) {
-        cleanupAndAnimate(daysElem, "rollOut");
+        daysAnimation = "flipOutX";
       }
     }
   } else if (seconds == 59) {
-    cleanupAndAnimate(minutesElem, "flipInX");
+    minutesAnimation = "flipInX";
     if (minutes == 59) {
-      cleanupAndAnimate(hoursElem, "zoomIn");
+      hoursAnimation = "flipInX";
       if (hours == 23) {
-        cleanupAndAnimate(daysElem, "rollIn");
+        daysAnimation = "flipInX";
       }
     }
   }
+  cleanupAndAnimate(secondsElem, secondsAnimation);
+  cleanupAndAnimate(minutesElem, minutesAnimation);
+  cleanupAndAnimate(hoursElem, hoursAnimation);
+  cleanupAndAnimate(daysElem, daysAnimation);
 }
 
 setInterval(updateTimer, 1000);
