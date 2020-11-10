@@ -176,6 +176,7 @@ function setupTimeValue(wrapperId, dataValue, enableRandomEffects = true) {
   if (enableRandomEffects) {
     valueElem.addEventListener("click", randomEffectOnParent);
     valueElem.addEventListener("touchstart", randomEffectOnParent);
+    wrapperElem.addEventListener("touchstart", randomEffect);
   }
   valueElem.innerHTML = dataValue;
   return wrapperElem;
